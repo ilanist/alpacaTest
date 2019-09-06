@@ -50,4 +50,4 @@ fi
 
 docker run hello-world
 
-sudo netstat -lntp | grep dockerd
+#sudo netstat -lntp | grep dockerd

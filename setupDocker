@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#--------------------
+# install docker
+#--------------------
+
+yes | sudo apt-get install docker.io
+# add group "docker" if not already exists
+if [ `less /etc/group | grep docker | wc -l` = "0" ]
+then
+ sudo groupadd docker
+ sudo usermod -aG docker $USER
+ newgrp docker
+  # test the new group
+ docker run-hello world
+fi 
+
+# update .docker to get rid of warning
+sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+sudo chmod g+rwx "$HOME/.docker" -R
+
+# start docker on boot (systemd)
+#sudo systemctl enable docker
+#sudo mkdir -p /etc/systemd/system/docker.service.d
+
+# create daemon.json from template if not existant
+if [ `sudo ls -l /etc/docker/daemon.json | wc -l` = "0" ]
+then
+sudo systemctl stop docker.service
+sudo chmod 664 ./daemon.json
+
+sudo cp deamon.json \
+/etc/docker/daemon.json
+fi 
+
+# create docker.service from template if not existant
+#if [ `sudo ls -l /etc/docker/docker.service | wc -l` = "0" ]
+#then
+#sudo systemctl stop docker.service
+#sudo chmod 664 ./docker.service
+#
+#sudo cp docker.service \
+#/etc/systemd/system/docker.service
+#fi
+
+# reload service
+#sudo systemctl daemon-reload
+#sleep 1
+#sudo systemctl restart docker.service
+
+docker run hello-world
+
+sudo netstat -lntp | grep dockerd

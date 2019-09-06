@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Setup for USB to CAN adapter
+# Manufacturer:  www.ixxat.com
+# Adapter details: Ixxat USB-to-CAN V2 professional
+# P/N: 1.01.0283.22002
+
+#--------------------
+# setup can interface
+#--------------------
+
+# this directory
+DIR=`pwd`
+
+# get build enviroment, download driver and build kernel module 
+yes | sudo apt-get install module-assistant \
+linux-headers-generic linux-headers-5.0.0-19-generic \
+can-utils
+
+sudo module-assistant prepare
+sudo modprobe can
+
+# download and unpack
+mkdir -p ~/Repositories/
+cd ~/Repositories/
+git clone https://github.com/ilanist/Ixxat_usb_to_can_linux-headers-5.0.0-19-generic.git
+cd Ixxat_usb_to_can_linux-headers-5.0.0-19-generic/candriver
+# build and install
+yes | make && sudo make install
+cd $DIR
+# setup device
+sudo ip link set can0 type can bitrate 125000
+sudo ip link set up can0
+sudo ip link set can1 type can bitrate 125000
+sudo ip link set up can1

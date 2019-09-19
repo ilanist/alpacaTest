@@ -7,4 +7,5 @@ DIR=`pwd`
 sudo apt-get update
 yes | sudo apt-get upgrade
 yes | sudo apt-get install vim geany \
-git-all synaptic python3.7 net-tools
+git-all synaptic python3.7 python3-pip \
+net-tools tshark

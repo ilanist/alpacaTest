@@ -46,13 +46,13 @@ then
 	# backup
 	sudo cp -b "$NET" "$BAK"
 	# configure
-	sudo echo "" >> $NET
-	sudo echo "$ID_STR" >> $NET
-	sudo echo "# Setup CAN Network for USB to CAN adapter (Ixxat USB-to-CAN V2 professional)" >> $NET
-	sudo echo "ip link set can0 type can bitrate $BITRATE" >> $NET
-	sudo echo "ip link set up can0" >> $NET
-	sudo echo "ip link set can1 type can bitrate $BITRATE" >> $NET
-	sudo echo "ip link set up can1" >> $NET
+	sudo sh -c "echo \"\" >> $NET"
+	sudo sh -c "echo \"$ID_STR\" >> $NET"
+	sudo sh -c "echo \"# Setup CAN Network for USB to CAN adapter (Ixxat USB-to-CAN V2 professional)\" >> $NET"
+	sudo sh -c "echo \"ip link set can0 type can bitrate $BITRATE\" >> $NET"
+	sudo sh -c "echo \"ip link set up can0\" >> $NET"
+	sudo sh -c "echo \"ip link set can1 type can bitrate $BITRATE\" >> $NET"
+	sudo sh -c "echo \"ip link set up can1\" >> $NET"
 	echo "Network config updated, written to: $NET"
 	echo "Restarting network services..."
 	# restart network

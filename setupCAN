@@ -62,3 +62,7 @@ else # do not touch config
 	echo "Network config is up to date, nothing written to: $NET"
 fi
 
+sudo ip link set can0 type can bitrate $BITRATE
+sudo ip link set can1 type can bitrate $BITRATE
+sudo ip link set up can0
+sudo ip link set up can1

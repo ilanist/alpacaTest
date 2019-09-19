@@ -36,7 +36,7 @@ BITRATE=1000000
 NET=/etc/network/interfaces #footest #/etc/network/interfaces
 BAK=/etc/network/interfaces.can.bak #footest.can.bak #/etc/network/interfaces.can.bak
 ID_STR="# This configuration was written by setupCAN"
-CONFIG_WRITTEN_BEFORE_CMD=`echo \`grep "$ID_STR" footest | wc -l\``
+CONFIG_WRITTEN_BEFORE_CMD=`echo \`grep "$ID_STR" "$NET" | wc -l\``
 
 # if the config file already has config, do not write.
 if [ "$CONFIG_WRITTEN_BEFORE_CMD" = "0" ]

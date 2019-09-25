@@ -31,6 +31,35 @@ cd Ixxat_usb_to_can_linux-headers-5.0.0-19-generic/candriver
 yes | make && sudo make install
 cd $DIR
 
+# boot with can interface support
+# if needed
+BOOT_CONFIG=/etc/modules #footest #/etc/modules
+BAKUP=/etc/modules.bak
+ID_STR="# This configuration was written by setupCAN"
+STARTUP_CONFIG_WRITTEN_BEFORE_CMD=`echo \`grep "$ID_STR" "$BOOT_CONFIG" | wc -l\``
+
+# if the config file already has config, do not write.
+if [ "$STARTUP_CONFIG_WRITTEN_BEFORE_CMD" = "0" ]
+
+# need new config
+then
+	# backup
+	sudo cp -b "$BOOT_CONFIG" "$BAKUP"
+	# configure
+	sudo sh -c "echo \"\" >> $BOOT_CONFIG"
+	sudo sh -c "echo \"$ID_STR\" >> $BOOT_CONFIG"
+	sudo sh -c "echo \"# Load USB to CAN adapter support (Ixxat USB-to-CAN V2 professional)\" >> $BOOT_CONFIG"
+	sudo sh -c "echo \"can\" >> $BOOT_CONFIG"
+	sudo sh -c "echo \"ixx_usb\" >> $BOOT_CONFIG"
+	echo "Boot time kmodule config updated, written to: $BOOT_CONFIG"
+	echo "Loading kmodule..."
+	# restart network
+	sudo modprobe can ixx_usb
+	echo "...Done"
+else # do not touch config
+	echo "Boot config is up to date, nothing written to: $BOOT_CONFIG"
+fi
+
 # update network config if needed
 BITRATE=1000000
 NET=/etc/network/interfaces #footest #/etc/network/interfaces
@@ -49,10 +78,22 @@ then
 	sudo sh -c "echo \"\" >> $NET"
 	sudo sh -c "echo \"$ID_STR\" >> $NET"
 	sudo sh -c "echo \"# Setup CAN Network for USB to CAN adapter (Ixxat USB-to-CAN V2 professional)\" >> $NET"
-	sudo sh -c "echo \"ip link set can0 type can bitrate $BITRATE\" >> $NET"
-	sudo sh -c "echo \"ip link set up can0\" >> $NET"
-	sudo sh -c "echo \"ip link set can1 type can bitrate $BITRATE\" >> $NET"
-	sudo sh -c "echo \"ip link set up can1\" >> $NET"
+    
+    sudo sh -c "echo \"auto can0\" >> $NET"
+    sudo sh -c "echo \"iface can0 inet manual\" >> $NET"
+    sudo sh -c "echo \"pre-up /sbin/ip link set can0 type can bitrate 1000000\" >> $NET"
+    sudo sh -c "echo \"up /sbin/ifconfig can0 up\" >> $NET"
+    sudo sh -c "echo \"down /sbin/ifconfig can0 down\" >> $NET"
+#	sudo sh -c "echo \"ip link set can0 type can bitrate $BITRATE\" >> $NET"
+#	sudo sh -c "echo \"ip link set up can0\" >> $NET"
+    
+    sudo sh -c "echo \"auto can1\" >> $NET"
+    sudo sh -c "echo \"iface can1 inet manual\" >> $NET"
+    sudo sh -c "echo \"pre-up /sbin/ip link set can1 type can bitrate 1000000\" >> $NET"
+    sudo sh -c "echo \"up /sbin/ifconfig can1 up\" >> $NET"
+    sudo sh -c "echo \"down /sbin/ifconfig can1 down\" >> $NET"
+#	sudo sh -c "echo \"ip link set can1 type can bitrate $BITRATE\" >> $NET"
+#	sudo sh -c "echo \"ip link set up can1\" >> $NET"
 	echo "Network config updated, written to: $NET"
 	echo "Restarting network services..."
 	# restart network
